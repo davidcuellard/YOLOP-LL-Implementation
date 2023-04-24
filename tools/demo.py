@@ -129,7 +129,7 @@ def detect(cfg,opt):
         #ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
         #ll_seg_mask = connect_lane(ll_seg_mask)
 
-        img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
+        img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True, is_ll=True)
 
         if len(det):
             det[:,:4] = scale_coords(img.shape[2:],det[:,:4],img_det.shape).round()
