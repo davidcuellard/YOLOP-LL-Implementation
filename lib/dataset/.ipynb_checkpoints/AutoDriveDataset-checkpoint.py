@@ -33,20 +33,19 @@ class AutoDriveDataset(Dataset):
         self.inputsize = inputsize
         self.Tensor = transforms.ToTensor()
         img_root = Path(cfg.DATASET.DATAROOT)
-        #label_root = Path(cfg.DATASET.LABELROOT)
-        #mask_root = Path(cfg.DATASET.MASKROOT)
+        label_root = Path(cfg.DATASET.LABELROOT)
+        mask_root = Path(cfg.DATASET.MASKROOT)
         lane_root = Path(cfg.DATASET.LANEROOT)
         if is_train:
             indicator = cfg.DATASET.TRAIN_SET
         else:
             indicator = cfg.DATASET.TEST_SET
         self.img_root = img_root / indicator
-        #self.label_root = label_root / indicator
-        #self.mask_root = mask_root / indicator
+        self.label_root = label_root / indicator
+        self.mask_root = mask_root / indicator
         self.lane_root = lane_root / indicator
         # self.label_list = self.label_root.iterdir()
-        #self.mask_list = self.mask_root.iterdir()
-        self.lane_list = self.lane_root.iterdir()
+        self.mask_list = self.mask_root.iterdir()
 
         self.db = []
 
@@ -99,13 +98,11 @@ class AutoDriveDataset(Dataset):
         data = self.db[idx]
         img = cv2.imread(data["image"], cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        ''' 
-        seg_label = cv2.imread(data["mask"], 0)
+        # seg_label = cv2.imread(data["mask"], 0)
         if self.cfg.num_seg_class == 3:
             seg_label = cv2.imread(data["mask"])
         else:
             seg_label = cv2.imread(data["mask"], 0)
-        '''
         lane_label = cv2.imread(data["lane"], 0)
         #print(lane_label.shape)
         # print(seg_label.shape)
@@ -119,17 +116,15 @@ class AutoDriveDataset(Dataset):
         if r != 1:  # always resize down, only resize up if training with augmentation
             interp = cv2.INTER_AREA if r < 1 else cv2.INTER_LINEAR
             img = cv2.resize(img, (int(w0 * r), int(h0 * r)), interpolation=interp)
-            #seg_label = cv2.resize(seg_label, (int(w0 * r), int(h0 * r)), interpolation=interp)
+            seg_label = cv2.resize(seg_label, (int(w0 * r), int(h0 * r)), interpolation=interp)
             lane_label = cv2.resize(lane_label, (int(w0 * r), int(h0 * r)), interpolation=interp)
         h, w = img.shape[:2]
         
-        #(img, seg_label, lane_label), ratio, pad = letterbox((img, seg_label, lane_label), resized_shape, auto=True, scaleup=self.is_train)
-        (img, lane_label), ratio, pad = letterbox((img, lane_label), resized_shape, auto=True, scaleup=self.is_train)
+        (img, seg_label, lane_label), ratio, pad = letterbox((img, seg_label, lane_label), resized_shape, auto=True, scaleup=self.is_train)
         shapes = (h0, w0), ((h / h0, w / w0), pad)  # for COCO mAP rescaling
         # ratio = (w / w0, h / h0)
         # print(resized_shape)
         
-        '''
         det_label = data["label"]
         labels=[]
         
@@ -140,13 +135,12 @@ class AutoDriveDataset(Dataset):
             labels[:, 2] = ratio[1] * h * (det_label[:, 2] - det_label[:, 4] / 2) + pad[1]  # pad height
             labels[:, 3] = ratio[0] * w * (det_label[:, 1] + det_label[:, 3] / 2) + pad[0]
             labels[:, 4] = ratio[1] * h * (det_label[:, 2] + det_label[:, 4] / 2) + pad[1]
-        '''    
+            
         if self.is_train:
-            combination = (img, lane_label)
-            (img, lane_label), labels = random_perspective(
+            combination = (img, seg_label, lane_label)
+            (img, seg_label, lane_label), labels = random_perspective(
                 combination=combination,
-                #targets=labels,
-                targets=(),
+                targets=labels,
                 degrees=self.cfg.DATASET.ROT_FACTOR,
                 translate=self.cfg.DATASET.TRANSLATE,
                 scale=self.cfg.DATASET.SCALE_FACTOR,
@@ -154,7 +148,7 @@ class AutoDriveDataset(Dataset):
             )
             #print(labels.shape)
             augment_hsv(img, hgain=self.cfg.DATASET.HSV_H, sgain=self.cfg.DATASET.HSV_S, vgain=self.cfg.DATASET.HSV_V)
-            # img, labels = cutout(combination=combination, labels=labels)
+            # img, seg_label, labels = cutout(combination=combination, labels=labels)
 
             if len(labels):
                 # convert xyxy to xywh
@@ -169,7 +163,7 @@ class AutoDriveDataset(Dataset):
             lr_flip = True
             if lr_flip and random.random() < 0.5:
                 img = np.fliplr(img)
-                #seg_label = np.fliplr(seg_label)
+                seg_label = np.fliplr(seg_label)
                 lane_label = np.fliplr(lane_label)
                 if len(labels):
                     labels[:, 1] = 1 - labels[:, 1]
@@ -178,7 +172,7 @@ class AutoDriveDataset(Dataset):
             ud_flip = False
             if ud_flip and random.random() < 0.5:
                 img = np.flipud(img)
-                #seg_label = np.filpud(seg_label)
+                seg_label = np.filpud(seg_label)
                 lane_label = np.filpud(lane_label)
                 if len(labels):
                     labels[:, 2] = 1 - labels[:, 2]
@@ -203,7 +197,6 @@ class AutoDriveDataset(Dataset):
         # if idx == 0:
         #     print(seg_label[:,:,0])
 
-        '''
         if self.cfg.num_seg_class == 3:
             _,seg0 = cv2.threshold(seg_label[:,:,0],128,255,cv2.THRESH_BINARY)
             _,seg1 = cv2.threshold(seg_label[:,:,1],1,255,cv2.THRESH_BINARY)
@@ -211,7 +204,6 @@ class AutoDriveDataset(Dataset):
         else:
             _,seg1 = cv2.threshold(seg_label,1,255,cv2.THRESH_BINARY)
             _,seg2 = cv2.threshold(seg_label,1,255,cv2.THRESH_BINARY_INV)
-        '''
         _,lane1 = cv2.threshold(lane_label,1,255,cv2.THRESH_BINARY)
         _,lane2 = cv2.threshold(lane_label,1,255,cv2.THRESH_BINARY_INV)
 #        _,seg2 = cv2.threshold(seg_label[:,:,2],1,255,cv2.THRESH_BINARY)
@@ -222,26 +214,25 @@ class AutoDriveDataset(Dataset):
         # seg0 = self.Tensor(seg0)
         if self.cfg.num_seg_class == 3:
             seg0 = self.Tensor(seg0)
-        #seg1 = self.Tensor(seg1)
-        #seg2 = self.Tensor(seg2)
+        seg1 = self.Tensor(seg1)
+        seg2 = self.Tensor(seg2)
         # seg1 = self.Tensor(seg1)
         # seg2 = self.Tensor(seg2)
         lane1 = self.Tensor(lane1)
         lane2 = self.Tensor(lane2)
 
         # seg_label = torch.stack((seg2[0], seg1[0]),0)
-        '''
         if self.cfg.num_seg_class == 3:
             seg_label = torch.stack((seg0[0],seg1[0],seg2[0]),0)
         else:
             seg_label = torch.stack((seg2[0], seg1[0]),0)
-        '''
+            
         lane_label = torch.stack((lane2[0], lane1[0]),0)
         # _, gt_mask = torch.max(seg_label, 0)
         # _ = show_seg_result(img, gt_mask, idx, 0, save_dir='debug', is_gt=True)
         
 
-        target = [labels_out, lane_label]
+        target = [labels_out, seg_label, lane_label]
         img = self.transform(img)
 
         return img, target, data["image"], shapes
