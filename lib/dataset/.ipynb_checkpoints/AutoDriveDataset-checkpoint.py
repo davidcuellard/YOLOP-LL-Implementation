@@ -253,7 +253,7 @@ class AutoDriveDataset(Dataset):
         target = [lane_label, lane_label, lane_label]
         img = self.transform(img)
 
-        return img, lane_label, data["image"], shapes
+        return img, target, data["image"], shapes
 
     def select_data(self, db):
         """
@@ -272,15 +272,15 @@ class AutoDriveDataset(Dataset):
     def collate_fn(batch):
         img, label, paths, shapes= zip(*batch)
         label_lane = []
-        #label_det, label_seg, label_lane = [], [], []
+        label_det, label_seg, label_lane = [], [], []
         for i, l in enumerate(label):
-            #l_det, l_seg, l_lane = l
-            l_lane = l
+            l_det, l_seg, l_lane = l
+            #l_lane = l
             l_lane[:, 0] = i  # add target image index for build_targets()
-            #label_det.append(l_det)
-            #label_seg.append(l_seg)
+            label_det.append(l_det)
+            label_seg.append(l_seg)
             label_lane.append(l_lane)
 
-        return torch.stack(img, 0), [torch.stack(label_lane, 0)], paths, shapes
+        return torch.stack(img, 0), [torch.stack(label_det, 0), torch.stack(label_seg, 0), torch.stack(label_lane, 0)], paths, shapes
 
 

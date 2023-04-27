@@ -29,13 +29,12 @@ def build_targets(cfg, predictions, targets, model):
     print(na, nt)
     tcls, tbox, indices, anch = [], [], [], []
     gain = torch.ones(7, device=targets.device)  # normalized to gridspace gain
-    ai = torch.arange(na, device=targets.device).float()  # same as .repeat_interleave(nt)
-    print(targets.shape, ai.shape)
 
-    targets = torch.cat((targets.repeat(na, 1, 1), ai[:, :, None]), 2)  # append anchor indices
-    #targets = torch.cat((targets.repeat(na, 1, 1), ai.T[:, :, None]), 2)
 
-    
+    ai = torch.arange(na, device=targets.device).float().view(1, na, 1, 1).repeat(1, 1, nt, 1)  # same as .repeat_interleave(nt)
+    targets = torch.cat((targets.repeat(na, 1, 1, 1), ai.unsqueeze(-1)), -1)  # append anchor indices
+
+
     g = 0.5  # bias
     off = torch.tensor([[0, 0],
                         [1, 0], [0, 1], [-1, 0], [0, -1],  # j,k,l,m
