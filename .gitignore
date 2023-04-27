@@ -12,3 +12,6 @@ inference/
 *.tar.gz
 dataset-yolop100/
 tools/.ipynb_checkpoints/
+lib/core/.ipynb_checkpoints/
+lib/dataset/.ipynb_checkpoints/
+lib/utils/.ipynb_checkpoints/
