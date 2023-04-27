@@ -34,12 +34,21 @@ class BddDataset(AutoDriveDataset):
             #label_path = mask_path.replace(str(self.mask_root), str(self.label_root)).replace(".png", ".json")
             image_path = mask_path.replace(str(self.lane_root), str(self.img_root)).replace(".png", ".jpg")
             lane_path = mask_path.replace(str(self.lane_root), str(self.lane_root))
+<<<<<<< HEAD
             #with open(label_path, 'r') as f:
             #    label = json.load(f)
             #data = label['frames'][0]['objects']
             #data = self.filter_data(data)
             #gt = np.zeros((len(data), 5))
             '''
+=======
+            '''
+            with open(label_path, 'r') as f:
+                label = json.load(f)
+            data = label['frames'][0]['objects']
+            data = self.filter_data(data)
+            gt = np.zeros((len(data), 5))
+>>>>>>> main
             for idx, obj in enumerate(data):
                 category = obj['category']
                 if category == "traffic light":

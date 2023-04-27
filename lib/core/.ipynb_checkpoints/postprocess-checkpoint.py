@@ -26,6 +26,7 @@ def build_targets(cfg, predictions, targets, model):
     # det = model.model[model.detector_index]
     # print(type(det))
     na, nt = det.na, targets.shape[0]  # number of anchors, targets
+<<<<<<< HEAD
     print(na, nt)
     tcls, tbox, indices, anch = [], [], [], []
     gain = torch.ones(7, device=targets.device)  # normalized to gridspace gain
@@ -35,6 +36,13 @@ def build_targets(cfg, predictions, targets, model):
     targets = torch.cat((targets.repeat(na, 1, 1, 1), ai.unsqueeze(-1)), -1)  # append anchor indices
 
 
+=======
+    tcls, tbox, indices, anch = [], [], [], []
+    gain = torch.ones(7, device=targets.device)  # normalized to gridspace gain
+    ai = torch.arange(na, device=targets.device).float().view(na, 1).repeat(1, nt)  # same as .repeat_interleave(nt)
+    targets = torch.cat((targets.repeat(na, 1, 1), ai[:, :, None]), 2)  # append anchor indices
+    print(targets.shape, ai.shape)
+>>>>>>> main
     
     g = 0.5  # bias
     off = torch.tensor([[0, 0],
