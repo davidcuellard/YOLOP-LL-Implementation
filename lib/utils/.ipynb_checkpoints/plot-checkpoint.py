@@ -21,7 +21,7 @@ def plot_img_and_mask(img, mask, index,epoch,save_dir):
     # plt.show()
     plt.savefig(save_dir+"/batch_{}_{}_seg.png".format(epoch,index))
 
-def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palette=None,is_demo=False,is_gt=False):
+def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palette=None,is_demo=False,is_gt=False, is_mask=False):
     # img = mmcv.imread(img)
     # img = img.copy()
     # seg = result[0]
@@ -45,16 +45,24 @@ def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palett
         
         # for label, color in enumerate(palette):
         #     color_area[result[0] == label, :] = color
-
-        color_area[result[0] == 1] = [0, 255, 0]
-        color_area[result[1] ==1] = [255, 0, 0]
-        color_seg = color_area
+        
+        #color_area[result[0] == 1] = [0, 255, 0]
+        if not is_mask:
+            color_area[result[1] ==1] = [255, 0, 0]
+            color_seg = color_area
+        else:
+            color_area[result[1] ==1] = [255, 255, 255]
+            color_seg = color_area
 
     # convert to BGR
     color_seg = color_seg[..., ::-1]
     # print(color_seg.shape)
     color_mask = np.mean(color_seg, 2)
-    img[color_mask != 0] = img[color_mask != 0] * 0.5 + color_seg[color_mask != 0] * 0.5
+    if not is_mask:
+        img[color_mask != 0] = img[color_mask != 0] * 0.5 + color_seg[color_mask != 0] * 0.5
+    else:
+        img[color_mask != 0] = color_seg[color_mask != 0]
+        img[color_mask == 0] = [0,0,0]
     # img = img * 0.5 + color_seg * 0.5
     img = img.astype(np.uint8)
     img = cv2.resize(img, (1280,720), interpolation=cv2.INTER_LINEAR)
@@ -77,7 +85,7 @@ def plot_one_box(x, img, color=None, label=None, line_thickness=None):
     tl = line_thickness or round(0.0001 * (img.shape[0] + img.shape[1]) / 2) + 1  # line/font thickness
     color = color or [random.randint(0, 255) for _ in range(3)]
     c1, c2 = (int(x[0]), int(x[1])), (int(x[2]), int(x[3]))
-    cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
+    #cv2.rectangle(img, c1, c2, color, thickness=tl, lineType=cv2.LINE_AA)
     # if label:
     #     tf = max(tl - 1, 1)  # font thickness
     #     t_size = cv2.getTextSize(label, 0, fontScale=tl / 3, thickness=tf)[0]
