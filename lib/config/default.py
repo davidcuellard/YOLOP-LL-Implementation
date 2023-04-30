@@ -59,7 +59,7 @@ _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
 _C.DATASET.DATA_FORMAT = 'jpg'
 _C.DATASET.SELECT_DATA = False
-_C.DATASET.ORG_IMG_SIZE = [720, 1280]
+_C.DATASET.ORG_IMG_SIZE = [1944, 2592]
 
 # training data augmentation
 _C.DATASET.FLIP = True
