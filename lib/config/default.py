@@ -50,11 +50,11 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = '/notebooks/YOLOP-LL-Implementation/dataset-yolop100/images'       # the path of images folder
-_C.DATASET.LABELROOT = '/notebooks/YOLOP-LL-Implementation/dataset-yolop100/det_test'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/notebooks/YOLOP-LL-Implementation/dataset-yolop100/bdd_lane_gt'                # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/notebooks/YOLOP-LL-Implementation/dataset-yolop100/bdd_lane_gt'               # the path of ll_seg_annotations folder
-_C.DATASET.DATASET = 'BddDataset'
+_C.DATASET.DATAROOT = '/notebooks/myDS/images'       # the path of images folder
+_C.DATASET.LABELROOT = '/notebooks/myDS/det_annotations_ll'      # the path of det_annotations folder
+_C.DATASET.MASKROOT = '/notebooks/myDS/lane_gt'                # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = '/notebooks/myDS/lane_gt'               # the path of ll_seg_annotations folder
+_C.DATASET.DATASET = 'myDS'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
 _C.DATASET.DATA_FORMAT = 'jpg'

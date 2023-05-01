@@ -39,7 +39,7 @@ transform=transforms.Compose([
 
 
 def detect(cfg,opt):
-
+    
     logger, _, _ = create_logger(
         cfg, cfg.LOG_DIR, 'demo')
 
@@ -51,7 +51,10 @@ def detect(cfg,opt):
 
     # Load model
     model = get_net(cfg)
-    checkpoint = torch.load(opt.weights, map_location= device)
+    if not opt.my_model:
+        checkpoint = torch.load(opt.weights, map_location= device)
+    else:
+        checkpoint = torch.load(opt.weights[0], map_location= device)
     model.load_state_dict(checkpoint['state_dict'])
     model = model.to(device)
     if half:
@@ -174,6 +177,7 @@ if __name__ == '__main__':
     parser.add_argument('--save-dir', type=str, default='inference/output', help='directory to save results')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
+    parser.add_argument('--my-model', type=bool, default=False, help='check my model')
     opt = parser.parse_args()
     with torch.no_grad():
         detect(cfg,opt)

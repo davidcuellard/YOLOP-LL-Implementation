@@ -39,6 +39,7 @@ def parse_args():
     parser.add_argument('--weights', nargs='+', type=str, default='/data2/zwt/wd/YOLOP/runs/BddDataset/detect_and_segbranch_whole/epoch-169.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
+    parser.add_argument('--my-model', type=bool, default=False, help='check my model')
     args = parser.parse_args()
 
     return args
@@ -81,7 +82,11 @@ def main():
 
     # det_idx_range = [str(i) for i in range(0,25)]
     model_dict = model.state_dict()
-    checkpoint_file = args.weights[0]
+    if not opt.my_model:
+        checkpoint_file = args.weights
+    else:
+        checkpoint_file = args.weights[0]
+        
     logger.info("=> loading checkpoint '{}'".format(checkpoint_file))
     checkpoint = torch.load(checkpoint_file)
     checkpoint_dict = checkpoint['state_dict']

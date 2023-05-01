@@ -39,6 +39,7 @@ def parse_args():
     parser.add_argument('--weights', nargs='+', type=str, default='/data2/zwt/wd/YOLOP/runs/BddDataset/detect_and_segbranch_whole/epoch-169.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
+    parser.add_argument('--my-model', type=bool, default=False, help='check my model')
     args = parser.parse_args()
 
     return args
@@ -81,7 +82,11 @@ def main():
 
     # det_idx_range = [str(i) for i in range(0,25)]
     model_dict = model.state_dict()
-    checkpoint_file = args.weights
+    if not opt.my_model:
+        checkpoint_file = args.weights
+    else:
+        checkpoint_file = args.weights[0]
+        
     logger.info("=> loading checkpoint '{}'".format(checkpoint_file))
     checkpoint = torch.load(checkpoint_file)
     checkpoint_dict = checkpoint['state_dict']
@@ -137,13 +142,14 @@ def main():
     )
     fi = fitness(np.array(detect_results).reshape(1, -1))
     msg =   'Test:    Loss({loss:.3f})\n' \
-            'Driving area Segment: Acc({da_seg_acc:.3f})    IOU ({da_seg_iou:.3f})    mIOU({da_seg_miou:.3f})\n' \
+            #'Driving area Segment: Acc({da_seg_acc:.3f})    IOU ({da_seg_iou:.3f})    mIOU({da_seg_miou:.3f})\n' \
                       'Lane line Segment: Acc({ll_seg_acc:.3f})    IOU ({ll_seg_iou:.3f})  mIOU({ll_seg_miou:.3f})\n' \
-                      'Detect: P({p:.3f})  R({r:.3f})  mAP@0.5({map50:.3f})  mAP@0.5:0.95({map:.3f})\n'\
+                      #'Detect: P({p:.3f})  R({r:.3f})  mAP@0.5({map50:.3f})  mAP@0.5:0.95({map:.3f})\n'\
                       'Time: inference({t_inf:.4f}s/frame)  nms({t_nms:.4f}s/frame)'.format(
-                          loss=total_loss, da_seg_acc=da_segment_results[0],da_seg_iou=da_segment_results[1],da_seg_miou=da_segment_results[2],
+                          loss=total_loss, 
+                          #da_seg_acc=da_segment_results[0],da_seg_iou=da_segment_results[1],da_seg_miou=da_segment_results[2],
                           ll_seg_acc=ll_segment_results[0],ll_seg_iou=ll_segment_results[1],ll_seg_miou=ll_segment_results[2],
-                          p=detect_results[0],r=detect_results[1],map50=detect_results[2],map=detect_results[3],
+                          #p=detect_results[0],r=detect_results[1],map50=detect_results[2],map=detect_results[3],
                           t_inf=times[0], t_nms=times[1])
     logger.info(msg)
     print("test finish")

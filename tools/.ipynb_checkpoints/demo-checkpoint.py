@@ -39,7 +39,7 @@ transform=transforms.Compose([
 
 
 def detect(cfg,opt):
-
+    
     logger, _, _ = create_logger(
         cfg, cfg.LOG_DIR, 'demo')
 
@@ -51,7 +51,10 @@ def detect(cfg,opt):
 
     # Load model
     model = get_net(cfg)
-    checkpoint = torch.load(opt.weights, map_location= device)
+    if not opt.my_model:
+        checkpoint = torch.load(opt.weights, map_location= device)
+    else:
+        checkpoint = torch.load(opt.weights[0], map_location= device)
     model.load_state_dict(checkpoint['state_dict'])
     model = model.to(device)
     if half:
@@ -129,7 +132,7 @@ def detect(cfg,opt):
         #ll_seg_mask = morphological_process(ll_seg_mask, kernel_size=7, func_type=cv2.MORPH_OPEN)
         #ll_seg_mask = connect_lane(ll_seg_mask)
 
-        img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True)
+        img_det = show_seg_result(img_det, (da_seg_mask, ll_seg_mask), _, _, is_demo=True, is_ll=True)
 
         if len(det):
             det[:,:4] = scale_coords(img.shape[2:],det[:,:4],img_det.shape).round()
@@ -174,6 +177,7 @@ if __name__ == '__main__':
     parser.add_argument('--save-dir', type=str, default='inference/output', help='directory to save results')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')
+    parser.add_argument('--my-model', type=bool, default=False, help='check my model')
     opt = parser.parse_args()
     with torch.no_grad():
         detect(cfg,opt)
