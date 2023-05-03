@@ -48,7 +48,7 @@ def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palett
         
         #color_area[result[0] == 1] = [0, 255, 0]
         if not is_mask:
-            color_area[result[1] ==1] = [255, 0, 0]
+            color_area[result[1] ==1] = [0, 255, 0]
             color_seg = color_area
         else:
             color_area[result[1] ==1] = [255, 255, 255]
@@ -67,6 +67,7 @@ def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palett
     img = img.astype(np.uint8)
     img = cv2.resize(img, (1280,720), interpolation=cv2.INTER_LINEAR)
 
+    '''
     if not is_demo:
         if not is_gt:
             if not is_ll:
@@ -77,6 +78,15 @@ def show_seg_result(img, result, index, epoch, save_dir=None, is_ll=False,palett
             if not is_ll:
                 cv2.imwrite(save_dir+"/batch_{}_{}_da_seg_gt.png".format(epoch,index), img)
             else:
+                cv2.imwrite(save_dir+"/batch_{}_{}_ll_seg_gt.png".format(epoch,index), img)  
+        if not is_demo:
+    '''
+    if not is_demo:
+        if not is_gt:
+            if is_ll:
+                cv2.imwrite(save_dir+"/batch_{}_{}_ll_segresult.png".format(epoch,index), img)
+        else:
+            if is_ll:
                 cv2.imwrite(save_dir+"/batch_{}_{}_ll_seg_gt.png".format(epoch,index), img)  
     return img
 

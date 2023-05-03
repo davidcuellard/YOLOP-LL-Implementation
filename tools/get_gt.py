@@ -43,7 +43,10 @@ def detect(cfg,opt):
     logger, _, _ = create_logger(
         cfg, cfg.LOG_DIR, 'get_gt')
 
-    device = select_device(logger,opt.device)
+    #device = select_device(logger,opt.device)
+    device = select_device(logger, batch_size=cfg.TRAIN.BATCH_SIZE_PER_GPU* len(cfg.GPUS)) if not cfg.DEBUG \
+        else select_device(logger, 'cpu')
+    
     if os.path.exists(opt.save_dir):  # output dir
         shutil.rmtree(opt.save_dir)  # delete dir
     os.makedirs(opt.save_dir)  # make new dir
@@ -170,7 +173,7 @@ if __name__ == '__main__':
     parser.add_argument('--img-size', type=int, default=640, help='inference size (pixels)')
     parser.add_argument('--conf-thres', type=float, default=0.25, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='IOU threshold for NMS')
-    parser.add_argument('--device', default='cpu', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    #parser.add_argument('--device', default='cpu', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
     parser.add_argument('--save-dir', type=str, default='inference/masks', help='directory to save results')
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--update', action='store_true', help='update all models')

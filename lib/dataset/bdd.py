@@ -32,7 +32,6 @@ class BddDataset(AutoDriveDataset):
         for mask in tqdm(list(self.mask_list)):
             mask_path = str(mask)
             label_path = str(self.label_list) + '/test.json'
-            print('aaaa', self.label_list)
             image_path = mask_path.replace(str(self.mask_root), str(self.img_root)).replace(".png", ".jpg")
             lane_path = mask_path.replace(str(self.mask_root), str(self.lane_root))
             with open(label_path, 'r') as f:

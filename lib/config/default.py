@@ -52,9 +52,9 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 _C.DATASET = CN(new_allowed=True)
 _C.DATASET.DATAROOT = '/notebooks/myDS/images'       # the path of images folder
 _C.DATASET.LABELROOT = '/notebooks/myDS/det_annotations_ll'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/notebooks/myDS/lane_gt'                # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/notebooks/myDS/lane_gt'               # the path of ll_seg_annotations folder
-_C.DATASET.DATASET = 'myDS'
+_C.DATASET.MASKROOT = '/notebooks/myDS/lane_gt2'                # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = '/notebooks/myDS/lane_gt2'               # the path of ll_seg_annotations folder
+_C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
 _C.DATASET.DATA_FORMAT = 'jpg'
@@ -90,7 +90,7 @@ _C.TRAIN.GAMMA1 = 0.99
 _C.TRAIN.GAMMA2 = 0.0
 
 _C.TRAIN.BEGIN_EPOCH = 0
-_C.TRAIN.END_EPOCH = 2
+_C.TRAIN.END_EPOCH = 50
 
 _C.TRAIN.VAL_FREQ = 1
 _C.TRAIN.BATCH_SIZE_PER_GPU =24
