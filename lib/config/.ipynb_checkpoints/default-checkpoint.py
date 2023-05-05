@@ -1,6 +1,13 @@
 import os
 from yacs.config import CfgNode as CN
 
+try:
+  import google.colab
+  IN_COLAB = True
+except:
+  IN_COLAB = False
+
+main_folder = '/content' if IN_COLAB else '/notebooks'
 
 _C = CN()
 
@@ -50,10 +57,10 @@ _C.LOSS.LL_IOU_GAIN = 0.2 # lane line iou loss gain
 
 # DATASET related params
 _C.DATASET = CN(new_allowed=True)
-_C.DATASET.DATAROOT = '/notebooks/myDS/images'       # the path of images folder
-_C.DATASET.LABELROOT = '/notebooks/myDS/det_annotations_ll'      # the path of det_annotations folder
-_C.DATASET.MASKROOT = '/notebooks/myDS/lane_gt'                # the path of da_seg_annotations folder
-_C.DATASET.LANEROOT = '/notebooks/myDS/lane_gt'               # the path of ll_seg_annotations folder
+_C.DATASET.DATAROOT = main_folder + '/myDS/images'       # the path of images folder
+_C.DATASET.LABELROOT = main_folder + '/myDS/det_annotations_ll'      # the path of det_annotations folder
+_C.DATASET.MASKROOT =  main_folder + '/myDS/lane_gt'                # the path of da_seg_annotations folder
+_C.DATASET.LANEROOT = main_folder + '/myDS/lane_gt'               # the path of ll_seg_annotations folder
 _C.DATASET.DATASET = 'BddDataset'
 _C.DATASET.TRAIN_SET = 'train'
 _C.DATASET.TEST_SET = 'val'
