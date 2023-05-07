@@ -36,10 +36,11 @@ def parse_args():
                         help='log directory',
                         type=str,
                         default='runs/')
-    parser.add_argument('--weights', nargs='+', type=str, default='/data2/zwt/wd/YOLOP/runs/BddDataset/detect_and_segbranch_whole/epoch-169.pth', help='model.pth path(s)')
+    parser.add_argument('--weights', nargs='+', type=str, default='weights/End-to-end.pth', help='model.pth path(s)')
     parser.add_argument('--conf_thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou_thres', type=float, default=0.6, help='IOU threshold for NMS')
-    parser.add_argument('--my-model', type=bool, default=False, help='check my model')
+    parser.add_argument('--my-model', default=False, help='check my model')
+    parser.add_argument('--getdata', default='', help='empty bdd or demo')
     args = parser.parse_args()
 
     return args
@@ -82,10 +83,13 @@ def main():
 
     # det_idx_range = [str(i) for i in range(0,25)]
     model_dict = model.state_dict()
-    if not args.my_model:
-        checkpoint_file = args.weights
-    else:
+
+
+    if args.my_model == 'True':
         checkpoint_file = args.weights[0]
+    else:
+        checkpoint_file = args.weights
+        
         
     logger.info("=> loading checkpoint '{}'".format(checkpoint_file))
     checkpoint = torch.load(checkpoint_file)
@@ -105,7 +109,7 @@ def main():
     normalize = transforms.Normalize(
         mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
     )
-
+    
     valid_dataset = eval('dataset.' + cfg.DATASET.DATASET)(
         cfg=cfg,
         is_train=False,
@@ -113,7 +117,8 @@ def main():
         transform=transforms.Compose([
             transforms.ToTensor(),
             normalize,
-        ])
+        ]),
+        getdata = args.getdata 
     )
 
     # valid_loader = DataLoaderX(

@@ -65,6 +65,7 @@ def parse_args():
     parser.add_argument('--local_rank', type=int, default=-1, help='DDP parameter, do not modify')
     parser.add_argument('--conf-thres', type=float, default=0.001, help='object confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.6, help='IOU threshold for NMS')
+    parser.add_argument('--getdata', default='', help='empty bdd or demo')
     args = parser.parse_args()
 
     return args
@@ -138,8 +139,14 @@ def main():
     Det_Head_para_idx = [str(i) for i in range(17, 25)]
     Da_Seg_Head_para_idx = [str(i) for i in range(25, 34)]
     Ll_Seg_Head_para_idx = [str(i) for i in range(34,43)]
+    
+    if args.getdata == "demo":
+        epoch_end = 2
+    else: 
+        epoch_end = cfg.TRAIN.END_EPOCH
+    
 
-    lf = lambda x: ((1 + math.cos(x * math.pi / cfg.TRAIN.END_EPOCH)) / 2) * \
+    lf = lambda x: ((1 + math.cos(x * math.pi / epoch_end)) / 2) * \
                    (1 - cfg.TRAIN.LRF) + cfg.TRAIN.LRF  # cosine
     lr_scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lf)
     begin_epoch = cfg.TRAIN.BEGIN_EPOCH
@@ -265,7 +272,8 @@ def main():
         transform=transforms.Compose([
             transforms.ToTensor(),
             normalize,
-        ])
+        ]),
+        getdata= args.getdata
     )
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset) if rank != -1 else None
 
@@ -288,7 +296,8 @@ def main():
             transform=transforms.Compose([
                 transforms.ToTensor(),
                 normalize,
-            ])
+            ]),
+            getdata=args.getdata
         )
 
         valid_loader = DataLoaderX(
@@ -315,7 +324,7 @@ def main():
     num_warmup = max(round(cfg.TRAIN.WARMUP_EPOCHS * num_batch), 1000)
     scaler = amp.GradScaler(enabled=device.type != 'cpu')
     print('=> start training...')
-    for epoch in range(begin_epoch+1, cfg.TRAIN.END_EPOCH+1):
+    for epoch in range(begin_epoch+1, epoch_end+1):
         if rank != -1:
             train_loader.sampler.set_epoch(epoch)
         # train for one epoch
@@ -325,7 +334,7 @@ def main():
         lr_scheduler.step()
 
         # evaluate on validation set
-        if (epoch % cfg.TRAIN.VAL_FREQ == 0 or epoch == cfg.TRAIN.END_EPOCH) and rank in [-1, 0]:
+        if (epoch % cfg.TRAIN.VAL_FREQ == 0 or epoch == epoch_end) and rank in [-1, 0]:
             # print('validate')
             da_segment_results,ll_segment_results,detect_results, total_loss,maps, times = validate(
                 epoch,cfg, valid_loader, valid_dataset, model, criterion,

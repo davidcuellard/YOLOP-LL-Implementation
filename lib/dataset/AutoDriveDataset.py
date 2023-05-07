@@ -15,7 +15,7 @@ class AutoDriveDataset(Dataset):
     """
     A general Dataset for some common function
     """
-    def __init__(self, cfg, is_train, inputsize=640, transform=None):
+    def __init__(self, cfg, is_train, inputsize=640, transform=None, getdata = ''):
         """
         initial all the characteristic
 
@@ -32,10 +32,24 @@ class AutoDriveDataset(Dataset):
         self.transform = transform
         self.inputsize = inputsize
         self.Tensor = transforms.ToTensor()
-        img_root = Path(cfg.DATASET.DATAROOT)
-        label_root = Path(cfg.DATASET.LABELROOT)
-        mask_root = Path(cfg.DATASET.MASKROOT)
-        lane_root = Path(cfg.DATASET.LANEROOT)
+        self.bdd = getdata
+        
+        if getdata == 'bdd':
+            img_root = Path(cfg.DATASET.DATAROOTBDD)
+            label_root = Path(cfg.DATASET.LABELROOTBDD)
+            mask_root = Path(cfg.DATASET.MASKROOTBDD)
+            lane_root = Path(cfg.DATASET.LANEROOTBDD)
+        elif getdata == 'demo':
+            img_root = Path(cfg.DATASET.DATAROOTDEMO)
+            label_root = Path(cfg.DATASET.LABELROOTDEMO)
+            mask_root = Path(cfg.DATASET.MASKROOTDEMO)
+            lane_root = Path(cfg.DATASET.LANEROOTDEMO)
+        else:
+            img_root = Path(cfg.DATASET.DATAROOT)
+            label_root = Path(cfg.DATASET.LABELROOT)
+            mask_root = Path(cfg.DATASET.MASKROOT)
+            lane_root = Path(cfg.DATASET.LANEROOT)
+            
         if is_train:
             indicator = cfg.DATASET.TRAIN_SET
         else:
