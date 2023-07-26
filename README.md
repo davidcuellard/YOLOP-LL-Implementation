@@ -1,15 +1,16 @@
-<div align="left">   
+
 
 # YOLOP Implementation for educational purposes
 
-Implementation for Computer Vision Course Work at Bournemouth University.
-    
-from: https://github.com/hustvl/YOLOP
-    
-    
+## Education purposes
+Author: David Cuellar
+
+# Model
+
+![image](https://github.com/davidcuellard/YOLOP-LL-Implementation/blob/main/inference/output/3c0e7240-96e390d2.jpg?raw=true)
+        
 
 ## Citation
-
 
 ```BibTeX
 @article{wu2022yolop,
