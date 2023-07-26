@@ -23,3 +23,5 @@ Author: David Cuellar
 }
 ```
 
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
