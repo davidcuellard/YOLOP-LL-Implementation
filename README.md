@@ -1,6 +1,8 @@
 <div align="left">   
 
 # YOLOP Implementation for educational purposes
+
+Implementation for Computer Vision Course Work at Bournemouth University.
     
 from: https://github.com/hustvl/YOLOP
     
